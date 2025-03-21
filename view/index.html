@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexa框架 - 现代P2P通信框架</title>
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <!-- Fonts -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+  
+  <!-- PrismJS for code highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-json.min.js"></script>
+  
+  <!-- PeerJS and Nexa -->
+    <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
+  </head>
+  <body>
+  <header class="header">
+    <div class="container">
+      <a href="#" class="logo">
+        <img src="assets/logo.svg" alt="Nexa Logo" width="36" height="36">
+        <span data-i18n="nav.title">Nexa</span>
+      </a>
+      <nav class="nav">
+        <a href="#home" class="nav-link active" data-tab="home-section" data-i18n="nav.home">首页</a>
+        <a href="#docs" class="nav-link" data-tab="docs-section" data-i18n="nav.docs">文档</a>
+        <a href="#api" class="nav-link" data-tab="api-section" data-i18n="nav.api">API</a>
+        <a href="#demo" class="nav-link" data-tab="demo-section" data-i18n="nav.demo">演示</a>
+      </nav>
+    </div>
+  </header>
+  
+  <!-- 首页部分 -->
+  <section id="home-section" class="tab-content" style="display: block;">
+    <div class="hero">
+      <div class="container">
+        <h1 class="hero-title fade-in" data-i18n="hero.title">Nexa框架</h1>
+        <p class="hero-subtitle fade-in" data-i18n="hero.subtitle">下一代P2P通信框架，让开发Web应用更简单、更高效</p>
+        <div class="fade-in">
+          <a href="#" class="btn btn-primary" onclick="switchTab('docs-section')" data-i18n="hero.start">开始使用</a>
+          <a href="#" class="btn btn-secondary" onclick="switchTab('demo-section')" data-i18n="hero.demo">查看演示</a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="container">
+      <section class="section fade-in">
+        <h2 class="section-title" data-i18n="features.title">核心特性</h2>
+        <div class="features">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-network-wired"></i>
+            </div>
+            <h3 class="feature-title" data-i18n="feature.p2p.title">P2P通信</h3>
+            <p data-i18n="feature.p2p.desc">基于WebRTC技术的点对点通信，无需中心服务器，降低延迟和成本。</p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-code"></i>
+            </div>
+            <h3 class="feature-title" data-i18n="feature.api.title">简洁API</h3>
+            <p data-i18n="feature.api.desc">直观易用的API设计，最小化学习成本，快速构建应用。</p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-laptop-code"></i>
+            </div>
+            <h3 class="feature-title" data-i18n="feature.cross.title">跨平台兼容</h3>
+            <p data-i18n="feature.cross.desc">支持各种现代浏览器和Node.js环境，一次编写，处处运行。</p>
+          </div>
+        </div>
+      </section>
+      
+      <section class="section fade-in">
+        <h2 class="section-title" data-i18n="quickstart.title">快速上手</h2>
+        <div class="api-example">
+          <div class="api-title">
+            <span data-i18n="server.side">服务器端</span>
+            <button class="copy-btn" data-i18n="copy">复制</button>
+          </div>
+          <pre><code class="language-javascript">// install peergate-server
+npm install peergate-server
+// pnpm install peergate-server
+pnpm add peergate-server
+
+// index.js
+const peergate = require("peergate-server");
+const app = peergate({ debug: true });
+
+app.seek("/hello", (seek, pom) => {
+  const id = seek.body.id;
+  pom.send({ message: "Hello World!", id: id });
+  // return: {message: "Hello World!", id: "我是一个人类" }
+});
+
+app.init().then(peerId => {
+  console.log(`服务器启动成功: ${peerId}`);
+});</code></pre>
+          
+          <div class="api-title">
+            <span data-i18n="client.side">客户端</span>
+            <button class="copy-btn" data-i18n="copy">复制</button>
+          </div>
+          <pre><code class="language-javascript">import Nexa from "https://unpkg.com/peergate-nexa/index.js";
+Nexa.init("服务器ID");
+// Nexa.init(["服务器ID1", "服务器ID2", "服务器ID3"]);
+const response = await Nexa.seek("/hello",{id:"我是一个人类"});
+console.log(response); // { message: "Hello World!", id: "我是一个人类" }</code></pre>
+        </div>
+      </section>
+      
+      <section class="section fade-in">
+        <h2 class="section-title" data-i18n="why.title">为什么选择Nexa?</h2>
+        <div class="features">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-tachometer-alt"></i>
+            </div>
+            <h3 class="feature-title" data-i18n="feature.performance.title">高性能</h3>
+            <p data-i18n="feature.performance.p1">直接P2P通信，减少网络跳转，大幅降低延迟。</p>
+            <p data-i18n="feature.performance.p2">支持多服务端+微服务集群并发，轻松应对高并发场景。</p>
+            <p data-i18n="feature.performance.p3">无需购买云服务器，无需备案，无需SSL证书,无需域名,无需任何服务器和云服务,即开即用。</p>
+            <p data-i18n="feature.performance.p4">Node.js框架 上手简单 学习成本极低 开发效率极高 开发体验极佳 无需任何服务器运维经验</p>
+            <p data-i18n="feature.performance.p5">不需要任何不可知成本 你能看到这个网页 就代表你已经拥有一个服务器</p>
+            <p data-i18n="feature.performance.p6">依赖于P2P节点 前后端分离 前后端可以独立开发 互不干扰 互不影响</p>
+            <p data-i18n="feature.performance.p7">摆脱传统服务器运维 告别服务器被攻击 告别服务器被DDOS 告别服务器被CC 告别服务器被墙 告别服务器被封锁</p>
+            <p data-i18n="feature.performance.p8">多节点集群 多节点负载均衡 多节点高可用 多节点高并发 多节点高稳定 多节点高安全</p>
+            <p data-i18n="feature.performance.p9">一切皆服务 一切皆节点 一切皆集群 一切皆负载均衡 一切皆高可用 一切皆高并发 一切皆高稳定 一切皆高安全</p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <h3 class="feature-title" data-i18n="feature.security.title">安全可靠</h3>
+            <p data-i18n="feature.security.p1">内置加密和认证机制，保障通信安全。</p>
+            <p data-i18n="feature.security.p2">非对称加密 对称加密 国密加密 多种加密方式 多种加密算法 多种加密库 多种加密库版本 多种加密库版本选择</p>
+            <p data-i18n="feature.security.p3">完全安全 完全可靠 完全可信 完全可控 完全可管理 完全可监控 完全可审计 完全可追溯</p>
+            <p data-i18n="feature.security.p4">无追踪 无监控 无审计 无管理 严格认证 超越HTTPS/TLS/SSL 最强的安全保障</p>
+            <p data-i18n="feature.security.p5">无后门 无漏洞 无风险 无威胁 无风险 无威胁 无风险 无威胁</p>
+          </div>
+          
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="fas fa-puzzle-piece"></i>
+            </div>
+            <h3 class="feature-title" data-i18n="feature.extensible.title">易于扩展</h3>
+            <p data-i18n="feature.extensible.p1">模块化设计，便于扩展和定制，满足各种应用场景。</p>
+            <p data-i18n="feature.extensible.p2">下一代Web框架 下一代Web标准 下一代Web协议 下一代Web技术 下一代Web架构 下一代Web开发 下一代Web运维</p>
+            <p data-i18n="feature.extensible.p3">高兼容性 高稳定性 高可靠性 高安全性 高可用性 高并发性 高稳定性 高可靠性 高安全性 高可用性 高并发性</p>
+            <p data-i18n="feature.extensible.p4">高扩展性 高定制性 高灵活性 高可维护性 高可测试性 高可读性 高可复用性 高可重用性 高可移植性 高可升级性</p>
+            <p data-i18n="feature.extensible.p5">维护简单 部署简单 安装简单 使用简单 学习简单 开发简单 运维简单 管理简单 监控简单 审计简单 追溯简单</p>
+            <p data-i18n="feature.extensible.p6">由Nexa框架+PeerGate构建的P2P应用 可以轻松迁移到其他框架 如Express 如Koa 如Nest 如SpringBoot 如Django 如Flask 如Laravel 如Ruby on Rails 如ASP.NET 如PHP 如Node.js 如Python 如Java 如C# 如C++ 如C 如Golang 如Rust 如Swift 如Kotlin 如Spring</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </section>
+  
+  <!-- 文档部分 -->
+  <section id="docs-section" class="tab-content" style="display: none;">
+    <div class="container">
+      <div class="section-title fade-in">
+        <h2 data-i18n="docs.title">文档中心</h2>
+      </div>
+      
+      <div class="documentation fade-in">
+        <div class="sidebar">
+          <div class="sidebar-nav">
+            <h3 class="sidebar-title">文档目录</h3>
+            <ul class="sidebar-list">
+              <li class="sidebar-item">
+                <a href="#intro" class="sidebar-link active" data-i18n="docs.menu.intro">框架介绍</a>
+              </li>
+              <li class="sidebar-item">
+                <a href="#quickstart" class="sidebar-link" data-i18n="docs.menu.quickstart">快速开始</a>
+              </li>
+              <li class="sidebar-item">
+                <a href="#concepts" class="sidebar-link" data-i18n="docs.menu.concepts">核心概念</a>
+              </li>
+              <li class="sidebar-item">
+                <a href="#examples" class="sidebar-link" data-i18n="docs.menu.examples">示例项目</a>
+              </li>
+              <li class="sidebar-item">
+                <a href="#advanced" class="sidebar-link" data-i18n="docs.menu.advanced">高级使用</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="content">
+          <h2 id="intro">Nexa框架介绍</h2>
+          <p>Nexa是一个基于PeerGate的现代Web框架，支持P2P通信，无需传统服务器即可构建强大的网络应用。本文档将帮助您快速上手Nexa框架，了解其核心概念和基本用法。</p>
+          
+          <h3>背景</h3>
+          <p>传统的Web应用通常依赖于中心化的服务器架构，这种模式在某些场景下会带来诸如高延迟、高成本、单点故障等问题。Nexa框架基于WebRTC技术，实现了点对点通信，让浏览器之间可以直接交换数据，无需经过中心服务器中转。</p>
+          
+          <h3>优势</h3>
+          <p>使用Nexa框架构建应用，您将获得以下优势：</p>
+          <ul>
+            <li>更低的延迟：数据直接在点与点之间传输，减少网络跳转</li>
+            <li>更低的成本：无需为大量传输数据的服务器付费</li>
+            <li>更好的隐私：数据不经过中心服务器，减少信息泄露风险</li>
+            <li>简单易用：简洁直观的API，降低学习和使用成本</li>
+          </ul>
+          
+          <h2 id="quickstart">快速开始</h2>
+          <p>要开始使用Nexa框架，您需要分别设置服务器端和客户端。</p>
+          
+          <h3>服务器端</h3>
+          <p>首先，安装PeerGate服务器：</p>
+          <pre><code class="language-bash">npm install peergate-server</code></pre>
+          
+          <p>创建一个简单的服务器：</p>
+          <pre><code class="language-javascript">const peergate = require("peergate-server");
+const app = peergate({ debug: true });
+
+// 注册API端点
+app.seek("/hello", (seek, pom) => {
+  pom.send({ message: "Hello from Nexa!" });
+});
+
+// 启动服务器
+app.init().then(peerId => {
+  console.log(`服务器启动成功，PeerID: ${peerId}`);
+});</code></pre>
+          
+          <h3>客户端</h3>
+          <p>在HTML文件中引入Nexa客户端：</p>
+          <pre><code class="language-html">&lt;script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"&gt;&lt;/script&gt;
+&lt;script type="module"&gt;
+        import Nexa from "https://unpkg.com/peergate-nexa/index.js";
+       
+  // 初始化连接
+  await Nexa.init("服务器的PeerID");
+  
+  // 发送请求
+  const response = await Nexa.seek("/hello");
+  console.log(response); // { message: "Hello from Nexa!" }
+&lt;/script&gt;</code></pre>
+          
+          <h2 id="concepts">核心概念</h2>
+          <h3>PeerID</h3>
+          <p>PeerID是每个Nexa服务器的唯一标识符，客户端通过PeerID找到并连接到特定的服务器。</p>
+          
+          <h3>Seek 和 Pom</h3>
+          <p>在Nexa框架中，通信基于"seek"和"pom"概念：</p>
+          <ul>
+            <li><strong>Seek</strong>：客户端发起的请求，包含目标路径和数据</li>
+            <li><strong>Pom</strong>：服务器的响应处理器，用于发送响应数据</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- API部分 -->
+  <section id="api-section" class="tab-content" style="display: none;">
+    <div class="container">
+      <div class="section-title fade-in">
+        <h2 data-i18n="api.title">API参考</h2>
+      </div>
+      
+      <div class="documentation fade-in">
+        <div class="sidebar">
+          <div class="sidebar-nav">
+            <h3 class="sidebar-title">API目录</h3>
+            <ul class="sidebar-list">
+              <li class="sidebar-item">
+                <a href="#api-client" class="sidebar-link active" data-i18n="api.menu.client">客户端API</a>
+              </li>
+              <li class="sidebar-item">
+                <a href="#api-server" class="sidebar-link" data-i18n="api.menu.server">服务器API</a>
+              </li>
+              <li class="sidebar-item">
+                <a href="#api-examples" class="sidebar-link" data-i18n="api.menu.examples">使用示例</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="content">
+          <h2 id="api-client">客户端API</h2>
+          
+          <h3>Nexa.init(peerId)</h3>
+          <p>初始化Nexa客户端，连接到指定的服务器。</p>
+          <pre><code class="language-javascript">await Nexa.init("server-peer-id");</code></pre>
+          <p>参数：</p>
+          <ul>
+            <li><strong>peerId</strong> (string): 服务器的PeerID</li>
+          </ul>
+          <p>返回值：</p>
+          <ul>
+            <li>Promise&lt;void&gt;: 连接成功后解析</li>
+          </ul>
+          
+          <h3>Nexa.seek(endpoint, data)</h3>
+          <p>向指定端点发送请求并等待响应。</p>
+          <pre><code class="language-javascript">const response = await Nexa.seek("/api/users", { id: 123 });</code></pre>
+          <p>参数：</p>
+          <ul>
+            <li><strong>endpoint</strong> (string): API端点路径</li>
+            <li><strong>data</strong> (object, 可选): 请求数据</li>
+          </ul>
+          <p>返回值：</p>
+          <ul>
+            <li>Promise&lt;object&gt;: 返回响应数据</li>
+          </ul>
+          
+          <h2 id="api-server">服务器API</h2>
+          
+          <h3>peergate(options)</h3>
+          <p>创建一个PeerGate服务器实例。</p>
+          <pre><code class="language-javascript">const app = peergate({
+  debug: true,
+  peerId: "custom-peer-id" // 可选
+});</code></pre>
+          <p>参数：</p>
+          <ul>
+            <li><strong>options</strong> (object): 服务器配置选项</li>
+            <ul>
+              <li><strong>debug</strong> (boolean, 可选): 是否启用调试模式</li>
+              <li><strong>peerId</strong> (string, 可选): 自定义PeerID</li>
+            </ul>
+          </ul>
+          
+          <h3>app.seek(path, handler)</h3>
+          <p>注册一个API端点处理器。</p>
+          <pre><code class="language-javascript">app.seek("/api/users", (seek, pom) => {
+  // 处理请求
+  pom.send({ users: [...] });
+});</code></pre>
+          <p>参数：</p>
+          <ul>
+            <li><strong>path</strong> (string): API端点路径</li>
+            <li><strong>handler</strong> (function): 处理请求的函数</li>
+            <ul>
+              <li><strong>seek</strong>: 请求对象，包含路径和请求数据</li>
+              <li><strong>pom</strong>: 响应处理器，用于发送响应数据</li>
+            </ul>
+          </ul>
+          
+          <h3>app.init()</h3>
+          <p>初始化服务器，生成PeerID并开始监听连接。</p>
+          <pre><code class="language-javascript">app.init().then(peerId => {
+  console.log(`服务器启动成功: ${peerId}`);
+});</code></pre>
+          <p>返回值：</p>
+          <ul>
+            <li>Promise&lt;string&gt;: 返回服务器的PeerID</li>
+          </ul>
+          
+          <h2 id="api-examples">使用示例</h2>
+          
+          <h3>创建用户API</h3>
+          <pre><code class="language-javascript">const users = [
+  { id: 1, name: "张三" },
+  { id: 2, name: "李四" }
+];
+
+// 获取用户列表
+app.seek("/users/list", (seek, pom) => {
+  pom.send({ users });
+});
+
+// 获取用户详情
+app.seek("/users/detail", (seek, pom) => {
+  const { id } = seek.body;
+  const user = users.find(u => u.id === Number(id));
+  
+  if (!user) {
+    pom.send({ error: "用户未找到", status: 404 });
+    return;
+  }
+  
+  pom.send({ user });
+});</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- 演示部分 -->
+  <section id="demo-section" class="tab-content" style="display: none;">
+    <div class="container">
+      <div class="section-title fade-in">
+        <h2 data-i18n="demo.title">功能演示</h2>
+        <p data-i18n="demo.subtitle">尝试与Nexa服务器进行实时交互，体验P2P通信的便捷和高效。</p>
+      </div>
+      
+      <div class="demo-container fade-in">
+        <h3 data-i18n="demo.calculator.title">计算器演示</h3>
+        <p data-i18n="demo.calculator.desc">通过Nexa框架实现的简单计算器功能，测试服务器通信。</p>
+        
+        <form class="demo-form" data-endpoint="/calculator/add" data-result="#calculator-result">
+          <div class="form-group">
+            <label class="form-label" data-i18n="demo.calculator.num_a">数字A</label>
+            <input type="number" name="a" class="form-input" value="5" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" data-i18n="demo.calculator.num_b">数字B</label>
+            <input type="number" name="b" class="form-input" value="3" required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" data-i18n="demo.calculator.operation">操作</label>
+            <select class="form-input" id="calculator-operation">
+              <option value="/calculator/add" data-i18n="demo.calculator.op.add">加法</option>
+              <option value="/calculator/subtract" data-i18n="demo.calculator.op.subtract">减法</option>
+              <option value="/calculator/multiply" data-i18n="demo.calculator.op.multiply">乘法</option>
+              <option value="/calculator/divide" data-i18n="demo.calculator.op.divide">除法</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary" data-i18n="demo.calculator.calculate">计算</button>
+          </div>
+        </form>
+        
+        <div id="calculator-result" class="demo-result">
+          <pre><code class="language-json" data-i18n="demo.calculator.result_tip">// 点击"计算"按钮查看结果</code></pre>
+        </div>
+      </div>
+      
+      <div class="demo-container fade-in">
+        <h3 data-i18n="demo.user.title">用户API演示</h3>
+        <p data-i18n="demo.user.desc">测试用户信息查询API，展示Nexa框架的数据处理能力。</p>
+        
+        <form class="demo-form" data-endpoint="/users/detail" data-result="#user-result">
+          <div class="form-group">
+            <label class="form-label" data-i18n="demo.user.id">用户ID</label>
+            <input type="number" name="id" class="form-input" value="1" required>
+          </div>
+          
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary" data-i18n="demo.user.query">查询</button>
+          </div>
+        </form>
+        
+        <div id="user-result" class="demo-result">
+          <pre><code class="language-json" data-i18n="demo.user.result_tip">// 点击"查询"按钮获取用户信息</code></pre>
+        </div>
+      </div>
+      
+      <div class="demo-container fade-in">
+        <h3 data-i18n="demo.docs.title">文档API演示</h3>
+        <p data-i18n="demo.docs.desc">从服务器获取文档内容，展示Nexa框架的内容管理能力。</p>
+        
+        <form class="demo-form" data-endpoint="/docs/content" data-result="#docs-result">
+          <div class="form-group">
+            <label class="form-label" data-i18n="demo.docs.section">文档部分</label>
+            <select name="section" class="form-input">
+              <option value="introduction">框架介绍</option>
+              <option value="quickstart">快速开始</option>
+              <option value="features">核心特性</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary" data-i18n="demo.docs.get">获取内容</button>
+          </div>
+        </form>
+        
+        <div id="docs-result" class="demo-result">
+          <pre><code class="language-json" data-i18n="demo.docs.result_tip">// 点击"获取内容"按钮查看文档信息</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-info">
+          <a href="#" class="footer-logo">Nexa框架</a>
+          <p class="footer-description" data-i18n="footer.desc">下一代P2P通信框架，让Web应用开发更简单、更高效。</p>
+        </div>
+        
+        <div class="footer-links">
+          <div class="footer-column">
+            <h3 data-i18n="footer.nav">导航</h3>
+            <ul class="footer-nav">
+              <li><a href="#" onclick="switchTab('home-section')" data-i18n="nav.home">首页</a></li>
+              <li><a href="#" onclick="switchTab('docs-section')" data-i18n="nav.docs">文档</a></li>
+              <li><a href="#" onclick="switchTab('api-section')" data-i18n="nav.api">API</a></li>
+              <li><a href="#" onclick="switchTab('demo-section')" data-i18n="nav.demo">演示</a></li>
+            </ul>
+          </div>
+          
+          <div class="footer-column">
+            <h3 data-i18n="footer.resources">资源</h3>
+            <ul class="footer-nav">
+              <li><a href="#" onclick="switchTab('docs-section')" data-i18n="footer.guide">入门指南</a></li>
+              <li><a href="#" onclick="switchTab('api-section')" data-i18n="footer.reference">API参考</a></li>
+              <li><a href="#" data-i18n="footer.examples">示例项目</a></li>
+              <li><a href="#" data-i18n="footer.faq">常见问题</a></li>
+            </ul>
+          </div>
+          
+          <div class="footer-column">
+            <h3 data-i18n="footer.community">社区</h3>
+            <ul class="footer-nav">
+              <li><a href="#" data-i18n="footer.github">GitHub</a></li>
+              <li><a href="#" data-i18n="footer.discuss">讨论区</a></li>
+              <li><a href="#" data-i18n="footer.feedback">问题反馈</a></li>
+              <li><a href="#" data-i18n="footer.contribute">贡献指南</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p data-i18n="footer.copyright">&copy; 2025 Nexa框架. 保留所有权利。</p>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- 脚本 -->
+  <script type="module" src="js/main.js"></script>
+  
+  <!-- 语言选择器 -->
+  <div class="language-selector">
+    <span data-i18n="language">Language</span>:
+    <a href="#" class="language-option" data-lang="zh-CN" data-i18n="language.zh">中文</a> |
+    <a href="#" class="language-option" data-lang="en" data-i18n="language.en">English</a> |
+    <a href="#" class="language-option" data-lang="ja" data-i18n="language.ja">Japanese</a>
+  </div>
+  
+  <script>
+    // 选项卡切换
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const tabId = link.getAttribute('data-tab');
+        switchTab(tabId);
+      });
+    });
+    
+    function switchTab(tabId) {
+      // 隐藏所有内容
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.style.display = 'none';
+      });
+      
+      // 移除所有激活状态
+      document.querySelectorAll('.nav-link').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      
+      // 显示选中的内容并激活对应选项卡
+      document.getElementById(tabId).style.display = 'block';
+      document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+    }
+    
+    // 操作选择变更
+    document.getElementById('calculator-operation').addEventListener('change', function() {
+      const form = this.closest('form');
+      form.setAttribute('data-endpoint', this.value);
+    });
+    
+    
+    // 当DOM加载完成后初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      // 初始化语言
+      initLanguage();
+      
+      // 语言切换点击事件
+      document.querySelectorAll('.language-option').forEach(option => {
+        option.addEventListener('click', (e) => {
+          e.preventDefault();
+          const lang = option.getAttribute('data-lang');
+          changeLanguage(lang);
+        });
+      });
+    });
+  </script>
+  
+  <!-- 添加新的演示部分 -->
+  <script type="module">
+    // 新增演示功能的DOM元素
+    document.addEventListener('DOMContentLoaded', function() {
+      // 获取演示区域容器
+      const demoSection = document.querySelector('#demo-section .container');
+      
+      // 添加聊天演示
+      const chatDemo = document.createElement('div');
+      chatDemo.className = 'demo-container fade-in';
+      chatDemo.innerHTML = `
+        <h3 data-i18n="demo.chat.title">实时聊天演示</h3>
+        <p data-i18n="demo.chat.desc">体验Nexa框架的实时通信能力，无需传统服务器。</p>
+        
+        <div class="chat-container">
+          <div class="chat-join">
+            <div class="form-group">
+              <label class="form-label" data-i18n="demo.chat.name">您的昵称</label>
+              <input type="text" id="chat-name" class="form-input" required>
+            </div>
+            <button id="chat-join-btn" class="btn btn-primary" data-i18n="demo.chat.join">加入聊天</button>
+          </div>
+          
+          <div class="chat-room" style="display: none;">
+            <h4 data-i18n="demo.chat.room">聊天室</h4>
+            <div class="chat-messages" id="chat-messages"></div>
+            <div class="chat-input">
+              <input type="text" id="chat-message" class="form-input" data-i18n-placeholder="demo.chat.message">
+              <button id="chat-send-btn" class="btn btn-primary" data-i18n="demo.chat.send">发送</button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // 添加文件传输演示
+      const fileDemo = document.createElement('div');
+      fileDemo.className = 'demo-container fade-in';
+      fileDemo.innerHTML = `
+        <h3 data-i18n="demo.file.title">文件传输演示</h3>
+        <p data-i18n="demo.file.desc">通过Nexa框架传输文件，展示P2P大数据传输能力。</p>
+        
+        <div class="file-upload">
+          <div class="form-group">
+            <label class="btn btn-secondary" for="file-input" data-i18n="demo.file.select">选择文件</label>
+            <input type="file" id="file-input" style="display: none;">
+            <span id="file-name">未选择文件</span>
+          </div>
+          <button id="file-upload-btn" class="btn btn-primary" data-i18n="demo.file.upload">上传</button>
+        </div>
+        
+        <div class="file-list">
+          <h4 data-i18n="demo.file.list">文件列表</h4>
+          <table class="file-table">
+            <thead>
+              <tr>
+                <th data-i18n="demo.file.name">文件名</th>
+                <th data-i18n="demo.file.size">大小</th>
+                <th data-i18n="demo.file.type">类型</th>
+                <th data-i18n="demo.file.action">操作</th>
+              </tr>
+            </thead>
+            <tbody id="file-list-body">
+              <!-- 文件列表将在这里动态加载 -->
+            </tbody>
+          </table>
+        </div>
+      `;
+      
+      // 添加数据可视化演示
+      const dataVisDemo = document.createElement('div');
+      dataVisDemo.className = 'demo-container fade-in';
+      dataVisDemo.innerHTML = `
+        <h3 data-i18n="demo.data.title">数据可视化演示</h3>
+        <p data-i18n="demo.data.desc">展示Nexa框架处理和可视化复杂数据的能力。</p>
+        
+        <div class="data-controls">
+          <div class="form-group">
+            <label class="form-label" data-i18n="demo.data.timerange">时间范围</label>
+            <select id="data-timerange" class="form-input">
+              <option value="7">7天</option>
+              <option value="30" selected>30天</option>
+              <option value="90">90天</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" data-i18n="demo.data.datapoints">数据点数</label>
+            <select id="data-points" class="form-input">
+              <option value="20">20</option>
+              <option value="50" selected>50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+          
+          <button id="data-refresh-btn" class="btn btn-primary" data-i18n="demo.data.refresh">刷新</button>
+        </div>
+        
+        <div class="data-visualization">
+          <canvas id="data-chart" width="800" height="400"></canvas>
+        </div>
+      `;
+      
+      // 将新演示添加到页面
+      demoSection.appendChild(chatDemo);
+      demoSection.appendChild(fileDemo);
+      demoSection.appendChild(dataVisDemo);
+    });
+  </script>
+  </body>
+</html>

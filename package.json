@@ -1,0 +1,20 @@
+{
+  "name": "nexa",
+  "version": "1.0.0",
+  "description": "Nexa",
+  "main": "index.js",
+  "dependencies": {
+    "nodemon": "^3.1.9",
+    "peergate-server": "^2.5.13"
+  },
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "build:css": "npx tailwindcss -i ./view/css/input.css -o ./view/css/styles.css --watch"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.0.15"
+  }
+}
