@@ -15,15 +15,37 @@
 
 # Nexa 框架
 
-[Nexa 网站](https://0010skn.github.io/peergate-demo/view/)
-
 [Nexa website](https://0010skn.github.io/peergate-demo/view/)
-
-[Nexa github](https://github.com/0010skn/peergate-demo)
 
 [Server npm](https://www.npmjs.com/package/peergate-server)
 
 [Nexa npm](https://www.npmjs.com/package/peergate-nexa)
+
+```bash
+Server startup failed: Error: Failed to launch the browser process!
+/root/.cache/puppeteer/chrome/linux-1108766/chrome-linux/chrome: error while loading shared libraries: libnss3.so: cannot open shared object file: No such file or directory
+TROUBLESHOOTING: https://pptr.dev/troubleshooting
+```
+
+Linux 解决办法：
+
+```bash
+apt-get update
+apt-get install -y \
+    libnss3 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libcups2 \
+    libdrm2 \
+    libxkbcommon0 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    libgbm1 \
+    libgtk-3-0 \
+    libpango-1.0-0 \
+    libasound2
+```
 
 Nexa 是一个基于 PeerGate 的 P2P 通信框架，使您能够构建无需传统服务器的 Web 应用程序。
 

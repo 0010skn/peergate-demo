@@ -154,8 +154,8 @@ const translations = {
     // 语言选择
     language: "语言",
     "language.zh": "中文",
-    "language.en": "英文",
-    "language.ja": "日文",
+    "language.en": "English",
+    "language.ja": "Japanese",
   },
 
   // 英文语言包
