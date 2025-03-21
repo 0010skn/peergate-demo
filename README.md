@@ -1,11 +1,31 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100" height="100" rx="20" fill="#007BFF"/>
+  <path d="M30 70L50 30L70 70" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="50" cy="50" r="30" stroke="white" stroke-width="4" stroke-dasharray="4 4"/>
+  <circle cx="50" cy="50" r="40" stroke="white" stroke-width="2" stroke-dasharray="2 2"/>
+</svg>
+
+<img src="https://visitor-badge.laobi.icu/badge?page_id=0010skn.peergate-demo" alt="访问量统计">
+<img src="https://img.shields.io/badge/Nexa-2.0.14-blue" alt="Nexa 版本">
+<img src="https://img.shields.io/badge/PeerGate-2.0.13-green" alt="PeerGate 版本">
+
+<img src="https://img.shields.io/github/stars/0010skn/peergate-demo?style=social" alt="Star 统计">
+<img src="https://img.shields.io/github/forks/0010skn/peergate-demo?style=social" alt="Fork 统计">
+<img src="https://img.shields.io/github/issues/0010skn/peergate-demo?style=social" alt="Issues 统计">
+
 # Nexa 框架
 
-[Nexa](https://0010skn.github.io/peergate-demo/view/)
+[Nexa 网站](https://0010skn.github.io/peergate-demo/view/)
+
 [Nexa website](https://0010skn.github.io/peergate-demo/view/)
+
 [Nexa github](https://github.com/0010skn/peergate-demo)
-[server npm](https://www.npmjs.com/package/peergate-server)
+
+[Server npm](https://www.npmjs.com/package/peergate-server)
+
 [Nexa npm](https://www.npmjs.com/package/peergate-nexa)
-这是一个展示 Nexa 框架功能的文档。Nexa 是一个基于 PeerGate 的 P2P 通信框架，使您能够构建无需传统服务器的 Web 应用程序。
+
+Nexa 是一个基于 PeerGate 的 P2P 通信框架，使您能够构建无需传统服务器的 Web 应用程序。
 
 ## 快速开始
 
