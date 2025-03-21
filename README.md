@@ -2,7 +2,9 @@
 
 [Nexa](https://0010skn.github.io/peergate-demo/view/)
 [Nexa website](https://0010skn.github.io/peergate-demo/view/)
-
+[Nexa github](https://github.com/0010skn/peergate-demo)
+[server npm](https://www.npmjs.com/package/peergate-server)
+[Nexa npm](https://www.npmjs.com/package/peergate-nexa)
 这是一个展示 Nexa 框架功能的文档。Nexa 是一个基于 PeerGate 的 P2P 通信框架，使您能够构建无需传统服务器的 Web 应用程序。
 
 ## 快速开始
