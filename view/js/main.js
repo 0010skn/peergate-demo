@@ -59,9 +59,16 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // 设置API演示表单
-function setupDemoForms() {
+async function setupDemoForms() {
   const demoForms = document.querySelectorAll(".demo-form");
-
+  if (!nexaInitialized) {
+    try {
+      await Nexa.init("my-server-R7999999");
+      nexaInitialized = true;
+    } catch (error) {
+      console.error("连接错误:", error);
+    }
+  }
   demoForms.forEach((form) => {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
