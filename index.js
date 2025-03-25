@@ -1,4 +1,8 @@
 const peergate = require("peergate-server");
+const RouteGroupManager = require("./route-group-manager");
+
+// 创建路由组管理器实例
+const routeGroupManager = new RouteGroupManager();
 
 // Create PeerGate server
 const app = peergate({
@@ -16,6 +20,207 @@ app.seek("/hello", (seek, pom) => {
     timestamp: Date.now(),
     receivedData: seek.body,
   });
+});
+
+// 添加oo路由处理器
+app.seek("/oo", (seek, pom) => {
+  const { action, clientId, route, group, strategy } = seek.body;
+
+  // 必须提供action
+  if (!action) {
+    pom.send({
+      success: false,
+      error: "缺少必要参数: action",
+      status: 400,
+    });
+    return;
+  }
+
+  // 根据action执行不同操作
+  switch (action) {
+    case "register":
+      // 注册客户端到路由组
+      if (!clientId || !route || !group) {
+        pom.send({
+          success: false,
+          error: "注册需要提供clientId, route和group参数",
+          status: 400,
+        });
+        return;
+      }
+
+      const success = routeGroupManager.registerClient(clientId, route, group);
+
+      pom.send({
+        success,
+        action,
+        clientId,
+        route,
+        group,
+        timestamp: Date.now(),
+      });
+
+      // 更新客户端活动时间
+      routeGroupManager.updateClientActivity(clientId);
+      break;
+
+    case "get-clients":
+      // 获取组内所有客户端
+      if (!group) {
+        pom.send({
+          success: false,
+          error: "获取客户端列表需要提供group参数",
+          status: 400,
+        });
+        return;
+      }
+
+      const clients = routeGroupManager.getGroupClients(group);
+
+      pom.send({
+        success: true,
+        action,
+        group,
+        clients,
+        count: clients.length,
+        timestamp: Date.now(),
+      });
+      break;
+
+    case "select-client":
+      // 从组中选择一个客户端
+      if (!group) {
+        pom.send({
+          success: false,
+          error: "选择客户端需要提供group参数",
+          status: 400,
+        });
+        return;
+      }
+
+      const selectedClientId = routeGroupManager.selectClientFromGroup(
+        group,
+        strategy
+      );
+
+      if (!selectedClientId) {
+        pom.send({
+          success: false,
+          error: "无法找到可用的客户端",
+          status: 404,
+        });
+        return;
+      }
+
+      pom.send({
+        success: true,
+        action,
+        group,
+        clientId: selectedClientId,
+        strategy: strategy || "random",
+        timestamp: Date.now(),
+      });
+
+      // 记录组请求
+      routeGroupManager.recordGroupRequest(group);
+      break;
+
+    case "get-route-client":
+      // 根据路由选择客户端
+      if (!route) {
+        pom.send({
+          success: false,
+          error: "需要提供route参数",
+          status: 400,
+        });
+        return;
+      }
+
+      const routeClientId = routeGroupManager.getClientForRoute(
+        route,
+        strategy
+      );
+
+      if (!routeClientId) {
+        pom.send({
+          success: false,
+          error: "无法找到处理该路由的客户端",
+          status: 404,
+        });
+        return;
+      }
+
+      pom.send({
+        success: true,
+        action,
+        route,
+        clientId: routeClientId,
+        strategy: strategy || "random",
+        timestamp: Date.now(),
+      });
+      break;
+
+    case "heartbeat":
+      // 客户端心跳更新
+      if (!clientId) {
+        pom.send({
+          success: false,
+          error: "心跳更新需要提供clientId参数",
+          status: 400,
+        });
+        return;
+      }
+
+      routeGroupManager.updateClientActivity(clientId);
+
+      pom.send({
+        success: true,
+        action,
+        clientId,
+        timestamp: Date.now(),
+      });
+      break;
+
+    case "disconnect":
+      // 客户端断开连接
+      if (!clientId) {
+        pom.send({
+          success: false,
+          error: "断开连接需要提供clientId参数",
+          status: 400,
+        });
+        return;
+      }
+
+      const disconnectSuccess = routeGroupManager.disconnectClient(clientId);
+
+      pom.send({
+        success: disconnectSuccess,
+        action,
+        clientId,
+        timestamp: Date.now(),
+      });
+      break;
+
+    case "stats":
+      // 获取所有组的统计信息
+      const stats = routeGroupManager.getGroupsStats();
+
+      pom.send({
+        success: true,
+        action,
+        stats,
+        timestamp: Date.now(),
+      });
+      break;
+
+    default:
+      pom.send({
+        success: false,
+        error: `不支持的操作: ${action}`,
+        status: 400,
+      });
+  }
 });
 
 app.seek("/add", (seek, pom) => {
@@ -404,6 +609,155 @@ function generateChartData(type, range, points) {
 
   return data;
 }
+
+// 路由组管理API
+
+// 注册客户端到路由组
+app.seek("/route/register", (seek, pom) => {
+  const { clientId, route, group } = seek.body;
+
+  if (!clientId || !route || !group) {
+    pom.send({
+      success: false,
+      error: "缺少必要参数",
+      status: 400,
+    });
+    return;
+  }
+
+  const success = routeGroupManager.registerClient(clientId, route, group);
+
+  pom.send({
+    success,
+    route,
+    group,
+    timestamp: Date.now(),
+  });
+
+  // 更新客户端活动时间
+  routeGroupManager.updateClientActivity(clientId);
+});
+
+// 获取特定组内所有连接的客户端ID
+app.seek("/route/group-clients", (seek, pom) => {
+  const { group } = seek.body;
+
+  if (!group) {
+    pom.send({
+      success: false,
+      error: "缺少组名参数",
+      status: 400,
+    });
+    return;
+  }
+
+  const clients = routeGroupManager.getGroupClients(group);
+
+  pom.send({
+    success: true,
+    group,
+    clients,
+    count: clients.length,
+    timestamp: Date.now(),
+  });
+});
+
+// 获取所有组及其客户端统计信息
+app.seek("/route/groups-stats", (seek, pom) => {
+  const stats = routeGroupManager.getGroupsStats();
+
+  pom.send({
+    success: true,
+    stats,
+    timestamp: Date.now(),
+  });
+});
+
+// 通过负载均衡策略选择组内客户端
+app.seek("/route/select-client", (seek, pom) => {
+  const { group, strategy } = seek.body;
+
+  if (!group) {
+    pom.send({
+      success: false,
+      error: "缺少组名参数",
+      status: 400,
+    });
+    return;
+  }
+
+  const clientId = routeGroupManager.selectClientFromGroup(group, strategy);
+
+  if (!clientId) {
+    pom.send({
+      success: false,
+      error: "组内没有可用的客户端",
+      status: 404,
+    });
+    return;
+  }
+
+  pom.send({
+    success: true,
+    group,
+    clientId,
+    strategy: strategy || "random",
+    timestamp: Date.now(),
+  });
+
+  // 记录组请求
+  routeGroupManager.recordGroupRequest(group);
+});
+
+// 客户端心跳更新
+app.seek("/route/heartbeat", (seek, pom) => {
+  const { clientId } = seek.body;
+
+  if (!clientId) {
+    pom.send({
+      success: false,
+      error: "缺少客户端ID参数",
+      status: 400,
+    });
+    return;
+  }
+
+  routeGroupManager.updateClientActivity(clientId);
+
+  pom.send({
+    success: true,
+    clientId,
+    timestamp: Date.now(),
+  });
+});
+
+// 客户端断开连接
+app.seek("/route/disconnect", (seek, pom) => {
+  const { clientId } = seek.body;
+
+  if (!clientId) {
+    pom.send({
+      success: false,
+      error: "缺少客户端ID参数",
+      status: 400,
+    });
+    return;
+  }
+
+  const success = routeGroupManager.disconnectClient(clientId);
+
+  pom.send({
+    success,
+    clientId,
+    timestamp: Date.now(),
+  });
+});
+
+// 创建定时任务，定期清理不活跃的客户端
+const CLEANUP_INTERVAL = 2 * 60 * 1000; // 2分钟
+setInterval(() => {
+  routeGroupManager.cleanInactiveClients();
+}, CLEANUP_INTERVAL);
 
 // Initialize server
 app

@@ -33,6 +33,7 @@
       </a>
       <nav class="nav">
         <a href="#home" class="nav-link active" data-tab="home-section" data-i18n="nav.home">首页</a>
+        <a onclick="window.open('./route-client-demo.html', '_blank')" class="nav-link" data-tab="home-section"  >P2PGroup</a>
         <a href="#docs" class="nav-link" data-tab="docs-section" data-i18n="nav.docs">文档</a>
         <a href="#api" class="nav-link" data-tab="api-section" data-i18n="nav.api">API</a>
         <a href="#demo" class="nav-link" data-tab="demo-section" data-i18n="nav.demo">演示</a>
@@ -201,19 +202,19 @@ console.log(response); // { message: "Hello World!", id: "我是一个人类" }<
         </div>
         
         <div class="content">
-          <h2 id="intro">Nexa框架介绍</h2>
-          <p>Nexa是一个基于PeerGate的现代Web框架，支持P2P通信，无需传统服务器即可构建强大的网络应用。本文档将帮助您快速上手Nexa框架，了解其核心概念和基本用法。</p>
+          <h2 id="intro" data-i18n="docs.intro.title">Nexa框架介绍</h2>
+          <p data-i18n="docs.intro.desc">Nexa是一个基于PeerGate的现代Web框架，支持P2P通信，无需传统服务器即可构建强大的网络应用。本文档将帮助您快速上手Nexa框架，了解其核心概念和基本用法。</p>
           
-          <h3>背景</h3>
-          <p>传统的Web应用通常依赖于中心化的服务器架构，这种模式在某些场景下会带来诸如高延迟、高成本、单点故障等问题。Nexa框架基于WebRTC技术，实现了点对点通信，让浏览器之间可以直接交换数据，无需经过中心服务器中转。</p>
+          <h3 data-i18n="docs.intro.background.title">背景</h3>
+          <p data-i18n="docs.intro.background.content">传统的Web应用通常依赖于中心化的服务器架构，这种模式在某些场景下会带来诸如高延迟、高成本、单点故障等问题。Nexa框架基于WebRTC技术，实现了点对点通信，让浏览器之间可以直接交换数据，无需经过中心服务器中转。</p>
           
-          <h3>优势</h3>
-          <p>使用Nexa框架构建应用，您将获得以下优势：</p>
+          <h3 data-i18n="docs.intro.advantages.title">优势</h3>
+          <p data-i18n="docs.intro.advantages.desc">使用Nexa框架构建应用，您将获得以下优势：</p>
           <ul>
-            <li>更低的延迟：数据直接在点与点之间传输，减少网络跳转</li>
-            <li>更低的成本：无需为大量传输数据的服务器付费</li>
-            <li>更好的隐私：数据不经过中心服务器，减少信息泄露风险</li>
-            <li>简单易用：简洁直观的API，降低学习和使用成本</li>
+            <li data-i18n="docs.intro.advantages.list.1">更低的延迟：数据直接在点与点之间传输，减少网络跳转</li>
+            <li data-i18n="docs.intro.advantages.list.2">更低的成本：无需为大量传输数据的服务器付费</li>
+            <li data-i18n="docs.intro.advantages.list.3">更好的隐私：数据不经过中心服务器，减少信息泄露风险</li>
+            <li data-i18n="docs.intro.advantages.list.4">简单易用：简洁直观的API，降低学习和使用成本</li>
           </ul>
           
           <h2 id="quickstart">快速开始</h2>
@@ -463,9 +464,9 @@ app.seek("/users/detail", (seek, pom) => {
           <div class="form-group">
             <label class="form-label" data-i18n="demo.docs.section">文档部分</label>
             <select name="section" class="form-input">
-              <option value="introduction">框架介绍</option>
-              <option value="quickstart">快速开始</option>
-              <option value="features">核心特性</option>
+              <option value="introduction" data-i18n="docs.section.introduction">框架介绍</option>
+              <option value="quickstart" data-i18n="docs.section.quickstart">快速开始</option>
+              <option value="features" data-i18n="docs.section.features">核心特性</option>
             </select>
           </div>
           
@@ -518,6 +519,12 @@ app.seek("/users/detail", (seek, pom) => {
               <li><a href="#" data-i18n="footer.feedback">问题反馈</a></li>
               <li><a href="#" data-i18n="footer.contribute">贡献指南</a></li>
             </ul>
+            
+            <div class="footer-social">
+              <a href="#" class="footer-icon"><i class="fab fa-github"></i></a>
+              <a href="#" class="footer-icon"><i class="fab fa-twitter"></i></a>
+              <a href="#" class="footer-icon"><i class="fab fa-linkedin"></i></a>
+            </div>
           </div>
         </div>
       </div>
@@ -698,3 +705,7 @@ app.seek("/users/detail", (seek, pom) => {
       </script>
   </body>
 </html>
+
+
+
+

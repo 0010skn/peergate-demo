@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title data-i18n="title">PeerGate 路由客户端演示</title>
+  <!-- 引入样式文件 -->
+   
+  <script src="https://unpkg.com/peerjs@1.5.1/dist/peerjs.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .client-card {
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .client-card.active {
+      background-color: #e7f5ff;
+      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.15);
+    }
+    
+    .status-indicator {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: #dc3545;
+    }
+    
+    .status-indicator.connected {
+      background-color: #28a745;
+    }
+    
+    .client-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    
+    .log-container {
+      height: 200px;
+      overflow-y: auto;
+      background-color: #f8f9fa;
+      padding: 10px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 12px;
+    }
+    
+    .log-entry {
+      margin-bottom: 4px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .log-entry.info {
+      color: #0d6efd;
+    }
+    
+    .log-entry.error {
+      color: #dc3545;
+    }
+    
+    .log-entry.success {
+      color: #198754;
+    }
+    
+    .stats-container {
+      background-color: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 20px;
+    }
+    
+    .stats-table {
+      width: 100%;
+    }
+    
+    .stats-table th {
+      text-align: left;
+      padding: 8px;
+      border-bottom: 1px solid #dee2e6;
+    }
+    
+    .stats-table td {
+      padding: 8px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .group-clients {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    
+    .client-chip {
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background-color: #e9ecef;
+    }
+    
+    .client-chip.self {
+      background-color: #cfe2ff;
+    }
+    
+    /* 语言选择器样式 */
+    .language-selector {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      z-index: 1000;
+      color: #fff;
+      font-size: 14px;
+    }
+    
+    .language-option {
+      display: inline-block;
+      margin-left: 8px;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    
+    .language-option:hover {
+      color: #fff;
+      text-decoration: none;
+    }
+    
+    .language-option.active {
+      color: #fff;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header class="bg-primary text-white py-4">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <h1 class="h3 mb-0" data-i18n="header.title">PeerGate 路由客户端演示</h1>
+        <nav>
+          <ul class="nav">
+            <li class="nav-item">
+              <a href="index.html" class="nav-link text-white">
+                <i class="fas fa-home"></i> <span data-i18n="nav.home">返回首页</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+    
+    <!-- 语言选择器 -->
+    <div class="language-selector">
+      <span data-i18n="language">语言</span>:
+      <a href="#" class="language-option active" data-lang="zh-CN" data-i18n="language.zh">中文</a> |
+      <a href="#" class="language-option" data-lang="en" data-i18n="language.en">English</a> |
+      <a href="#" class="language-option" data-lang="ja" data-i18n="language.ja">日本語</a>
+    </div>
+  </header>
+
+  <main class="container py-4">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h2 class="h5 mb-0" data-i18n="register.title">注册客户端</h2>
+          </div>
+          <div class="card-body">
+            <form id="register-form">
+              <div class="mb-3">
+                <label for="route-input" class="form-label" data-i18n="register.route">路由路径</label>
+                <input type="text" id="route-input" class="form-control" data-i18n-placeholder="register.route_placeholder" placeholder="/api/users" required>
+              </div>
+              <div class="mb-3">
+                <label for="group-input" class="form-label" data-i18n="register.group">组名称</label>
+                <input type="text" id="group-input" class="form-control" data-i18n-placeholder="register.group_placeholder" placeholder="user-service" required>
+              </div>
+              <button type="submit" class="btn btn-primary" data-i18n="register.submit">注册</button>
+              <button type="button" id="disconnect-btn" class="btn btn-outline-danger ms-2" disabled data-i18n="register.disconnect">断开连接</button>
+            </form>
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header">
+            <h2 class="h5 mb-0" data-i18n="client.status_title">客户端状态</h2>
+          </div>
+          <div class="card-body">
+            <div id="client-info" class="client-card">
+              <div class="status-indicator" id="status-indicator"></div>
+              <h3 class="h6" data-i18n="client.id">客户端ID</h3>
+              <p id="client-id" data-i18n="client.not_initialized">未初始化</p>
+              <h3 class="h6" data-i18n="client.route">当前路由</h3>
+              <p id="current-route" data-i18n="client.not_registered">未注册</p>
+              <h3 class="h6" data-i18n="client.group">当前组</h3>
+              <p id="current-group" data-i18n="client.not_registered">未注册</p>
+              <div class="client-actions">
+                <button id="refresh-status-btn" class="btn btn-sm btn-outline-primary">
+                  <i class="fas fa-sync-alt"></i> <span data-i18n="client.refresh_status">刷新状态</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0" data-i18n="log.title">操作日志</h2>
+            <button id="clear-log-btn" class="btn btn-sm btn-outline-secondary" data-i18n="log.clear">
+              清除日志
+            </button>
+          </div>
+          <div class="card-body">
+            <div class="log-container" id="log-container"></div>
+          </div>
+        </div>
+
+        <div class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h2 class="h5 mb-0" data-i18n="members.title">组成员</h2>
+            <button id="refresh-members-btn" class="btn btn-sm btn-outline-primary">
+              <i class="fas fa-sync-alt"></i> <span data-i18n="members.refresh">刷新</span>
+            </button>
+          </div>
+          <div class="card-body">
+            <div id="group-members-container">
+              <p class="text-muted" data-i18n="members.register_first">请先注册到一个组</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0" data-i18n="stats.title">组统计信息</h2>
+        <button id="refresh-stats-btn" class="btn btn-sm btn-outline-primary">
+          <i class="fas fa-sync-alt"></i> <span data-i18n="stats.refresh">刷新统计</span>
+        </button>
+      </div>
+      <div class="card-body">
+        <div id="stats-container">
+          <p class="text-muted" data-i18n="stats.not_available">未获取统计信息</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h2 class="h5 mb-0" data-i18n="select_client.title">从组中选择客户端</h2>
+          </div>
+          <div class="card-body">
+            <form id="select-client-form">
+              <div class="mb-3">
+                <label for="group-select" class="form-label" data-i18n="select_client.group">组名称</label>
+                <input type="text" id="group-select" class="form-control" data-i18n-placeholder="select_client.group_placeholder" placeholder="留空使用当前组">
+              </div>
+              <div class="mb-3">
+                <label for="strategy-select" class="form-label" data-i18n="select_client.strategy">负载均衡策略</label>
+                <select id="strategy-select" class="form-select">
+                  <option value="random" data-i18n="select_client.strategy_random">随机 (random)</option>
+                  <option value="round-robin" data-i18n="select_client.strategy_roundrobin">轮询 (round-robin)</option>
+                  <option value="least-active" data-i18n="select_client.strategy_leastactive">最不活跃 (least-active)</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary" data-i18n="select_client.submit">选择客户端</button>
+            </form>
+            <div class="mt-3" id="selected-client-result"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card mb-4">
+          <div class="card-header">
+            <h2 class="h5 mb-0" data-i18n="route_client.title">根据路由获取客户端</h2>
+          </div>
+          <div class="card-body">
+            <form id="route-client-form">
+              <div class="mb-3">
+                <label for="route-select" class="form-label" data-i18n="route_client.route">路由路径</label>
+                <input type="text" id="route-select" class="form-control" data-i18n-placeholder="route_client.route_placeholder" placeholder="/api/users" required>
+              </div>
+              <div class="mb-3">
+                <label for="route-strategy-select" class="form-label" data-i18n="route_client.strategy">负载均衡策略</label>
+                <select id="route-strategy-select" class="form-select">
+                  <option value="random" data-i18n="route_client.strategy_random">随机 (random)</option>
+                  <option value="round-robin" data-i18n="route_client.strategy_roundrobin">轮询 (round-robin)</option>
+                  <option value="least-active" data-i18n="route_client.strategy_leastactive">最不活跃 (least-active)</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary" data-i18n="route_client.submit">获取客户端</button>
+            </form>
+            <div class="mt-3" id="route-client-result"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-light py-4 mt-auto">
+    <div class="container">
+      <div class="d-flex justify-content-between align-items-center">
+        <p class="mb-0">
+          <small data-i18n="footer.copyright">&copy; 2025 PeerGate. 保留所有权利.</small>
+        </p>
+        <div>
+          <a href="#" class="text-decoration-none text-muted me-3">
+            <i class="fab fa-github"></i> <span data-i18n="footer.github">GitHub</span>
+          </a>
+          <a href="#" class="text-decoration-none text-muted">
+            <i class="fas fa-book"></i> <span data-i18n="footer.docs">文档</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 引入JavaScript库 -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <!-- 引入i18n文件 -->
+  <script src="js/i18n.js"></script>
+  <script type="module">
+    import routeClient from './js/route-client.js';
+
+    // 日志系统
+    const logContainer = document.getElementById('log-container');
+    
+    function addLog(message, type = 'info') {
+      const logEntry = document.createElement('div');
+      logEntry.className = `log-entry ${type}`;
+      
+      const timestamp = new Date().toLocaleTimeString();
+      logEntry.textContent = `[${timestamp}] ${message}`;
+      
+      logContainer.appendChild(logEntry);
+      logContainer.scrollTop = logContainer.scrollHeight; // 自动滚动到底部
+    }
+    
+    document.getElementById('clear-log-btn').addEventListener('click', () => {
+      logContainer.innerHTML = '';
+      addLog(i18next.t('log.cleared'));
+    });
+
+    // 更新客户端状态显示
+    function updateClientStatus() {
+      const status = routeClient.getStatus();
+      
+      document.getElementById('client-id').textContent = status.clientId || i18next.t('client.not_initialized');
+      document.getElementById('current-route').textContent = status.route || i18next.t('client.not_registered');
+      document.getElementById('current-group').textContent = status.group || i18next.t('client.not_registered');
+      
+      const statusIndicator = document.getElementById('status-indicator');
+      const clientInfo = document.getElementById('client-info');
+      
+      if (status.connected) {
+        statusIndicator.classList.add('connected');
+        clientInfo.classList.add('active');
+      } else {
+        statusIndicator.classList.remove('connected');
+        clientInfo.classList.remove('active');
+      }
+      
+      // 更新断开连接按钮状态
+      document.getElementById('disconnect-btn').disabled = !status.connected;
+    }
+    
+    // 初始化
+    async function init() {
+      try {
+        await routeClient.init();
+        updateClientStatus();
+        addLog(i18next.t('log.init_success'), 'success');
+      } catch (error) {
+        addLog(`${i18next.t('log.init_error')}: ${error.message}`, 'error');
+      }
+    }
+    
+    // 注册表单提交
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const route = document.getElementById('route-input').value;
+      const group = document.getElementById('group-input').value;
+      
+      try {
+        addLog(i18next.t('log.register_attempt', {route, group}));
+        const response = await routeClient.register(route, group);
+        
+        if (response.success) {
+          addLog(i18next.t('log.register_success', {route, group}), 'success');
+          updateClientStatus();
+          loadGroupMembers();
+          loadGroupStats();
+        } else {
+          addLog(`${i18next.t('log.register_failed')}: ${response.error}`, 'error');
+        }
+      } catch (error) {
+        addLog(`${i18next.t('log.register_error')}: ${error.message}`, 'error');
+      }
+    });
+    
+    // 断开连接按钮
+    document.getElementById('disconnect-btn').addEventListener('click', async () => {
+      try {
+        addLog(i18next.t('log.disconnect_attempt'));
+        const response = await routeClient.disconnect();
+        
+        if (response.success) {
+          addLog(i18next.t('log.disconnect_success'), 'success');
+          updateClientStatus();
+          document.getElementById('group-members-container').innerHTML = 
+            `<p class="text-muted">${i18next.t('members.register_first')}</p>`;
+        } else {
+          addLog(`${i18next.t('log.disconnect_failed')}: ${response.error}`, 'error');
+        }
+      } catch (error) {
+        addLog(`${i18next.t('log.disconnect_error')}: ${error.message}`, 'error');
+      }
+    });
+    
+    // 刷新状态按钮
+    document.getElementById('refresh-status-btn').addEventListener('click', () => {
+      updateClientStatus();
+      addLog(i18next.t('log.status_refreshed'));
+    });
+    
+    // 加载组成员
+    async function loadGroupMembers() {
+      const status = routeClient.getStatus();
+      
+      if (!status.connected || !status.group) {
+        document.getElementById('group-members-container').innerHTML = 
+          `<p class="text-muted">${i18next.t('members.register_first')}</p>`;
+        return;
+      }
+      
+      try {
+        addLog(i18next.t('log.members_loading', {group: status.group}));
+        const response = await routeClient.getGroupClients();
+        
+        if (response.success) {
+          addLog(i18next.t('log.members_success', {count: response.count}), 'success');
+          
+          if (response.count > 0) {
+            let html = `<h3 class="h6 mb-3">${i18next.t('members.list', {group: response.group, count: response.count})}</h3>`;
+            html += '<div class="group-clients">';
+            
+            response.clients.forEach(clientId => {
+              const isSelf = clientId === status.clientId;
+              html += `<div class="client-chip ${isSelf ? 'self' : ''}" 
+                        title="${isSelf ? i18next.t('members.current_client') : ''}">${clientId}</div>`;
+            });
+            
+            html += '</div>';
+            document.getElementById('group-members-container').innerHTML = html;
+          } else {
+            document.getElementById('group-members-container').innerHTML = 
+              `<p class="text-muted">${i18next.t('members.empty', {group: response.group})}</p>`;
+          }
+        } else {
+          addLog(`${i18next.t('log.members_failed')}: ${response.error}`, 'error');
+          document.getElementById('group-members-container').innerHTML = 
+            `<p class="text-danger">${i18next.t('members.load_failed')}</p>`;
+        }
+      } catch (error) {
+        addLog(`${i18next.t('log.members_error')}: ${error.message}`, 'error');
+        document.getElementById('group-members-container').innerHTML = 
+          `<p class="text-danger">${i18next.t('members.load_error')}</p>`;
+      }
+    }
+    
+    // 刷新组成员按钮
+    document.getElementById('refresh-members-btn').addEventListener('click', loadGroupMembers);
+    
+    // 加载组统计信息
+    async function loadGroupStats() {
+      try {
+        addLog(i18next.t('log.stats_loading'));
+        const response = await routeClient.getGroupsStats();
+        
+        if (response.success) {
+          addLog(i18next.t('log.stats_success'), 'success');
+          
+          const stats = response.stats;
+          const groupNames = Object.keys(stats);
+          
+          if (groupNames.length > 0) {
+            let html = '<table class="stats-table">';
+            html += `
+              <thead>
+                <tr>
+                  <th>${i18next.t('stats.group_name')}</th>
+                  <th>${i18next.t('stats.client_count')}</th>
+                  <th>${i18next.t('stats.request_count')}</th>
+                </tr>
+              </thead>
+              <tbody>
+            `;
+            
+            groupNames.forEach(group => {
+              const groupStats = stats[group];
+              html += `
+                <tr>
+                  <td>${group}</td>
+                  <td>${groupStats.clientCount}</td>
+                  <td>${groupStats.requestCount}</td>
+                </tr>
+              `;
+            });
+            
+            html += '</tbody></table>';
+            document.getElementById('stats-container').innerHTML = html;
+          } else {
+            document.getElementById('stats-container').innerHTML = 
+              `<p class="text-muted">${i18next.t('stats.no_active_groups')}</p>`;
+          }
+        } else {
+          addLog(`${i18next.t('log.stats_failed')}: ${response.error}`, 'error');
+          document.getElementById('stats-container').innerHTML = 
+            `<p class="text-danger">${i18next.t('stats.load_failed')}</p>`;
+        }
+      } catch (error) {
+        addLog(`${i18next.t('log.stats_error')}: ${error.message}`, 'error');
+        document.getElementById('stats-container').innerHTML = 
+          `<p class="text-danger">${i18next.t('stats.load_error')}</p>`;
+      }
+    }
+    
+    // 刷新统计按钮
+    document.getElementById('refresh-stats-btn').addEventListener('click', loadGroupStats);
+    
+    // 选择客户端表单
+    document.getElementById('select-client-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const group = document.getElementById('group-select').value;
+      const strategy = document.getElementById('strategy-select').value;
+      
+      try {
+        addLog(i18next.t('log.select_client_attempt', {
+          group: group ? group : i18next.t('select_client.current_group'),
+          strategy: strategy
+        }));
+        const response = await routeClient.selectClientFromGroup(group || null, strategy);
+        
+        if (response.success) {
+          addLog(i18next.t('log.select_client_success', {
+            clientId: response.clientId,
+            group: response.group,
+            strategy: response.strategy
+          }), 'success');
+          
+          let html = `
+            <div class="alert alert-success">
+              <h6>${i18next.t('select_client.success')}</h6>
+              <p><strong>${i18next.t('select_client.client_id')}:</strong> ${response.clientId}</p>
+              <p><strong>${i18next.t('select_client.group')}:</strong> ${response.group}</p>
+              <p><strong>${i18next.t('select_client.strategy')}:</strong> ${response.strategy}</p>
+            </div>
+          `;
+          
+          document.getElementById('selected-client-result').innerHTML = html;
+        } else {
+          addLog(`${i18next.t('log.select_client_failed')}: ${response.error}`, 'error');
+          
+          document.getElementById('selected-client-result').innerHTML = `
+            <div class="alert alert-danger">
+              ${response.error}
+            </div>
+          `;
+        }
+      } catch (error) {
+        addLog(`${i18next.t('log.select_client_error')}: ${error.message}`, 'error');
+        
+        document.getElementById('selected-client-result').innerHTML = `
+          <div class="alert alert-danger">
+            ${error.message}
+          </div>
+        `;
+      }
+    });
+    
+    // 根据路由获取客户端表单
+    document.getElementById('route-client-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const route = document.getElementById('route-select').value;
+      const strategy = document.getElementById('route-strategy-select').value;
+      
+      try {
+        addLog(i18next.t('log.route_client_attempt', {route: route, strategy: strategy}));
+        const response = await routeClient.getClientForRoute(route, strategy);
+        
+        if (response.success) {
+          addLog(i18next.t('log.route_client_success', {
+            clientId: response.clientId,
+            route: response.route,
+            strategy: response.strategy
+          }), 'success');
+          
+          let html = `
+            <div class="alert alert-success">
+              <h6>${i18next.t('route_client.success')}</h6>
+              <p><strong>${i18next.t('route_client.client_id')}:</strong> ${response.clientId}</p>
+              <p><strong>${i18next.t('route_client.route')}:</strong> ${response.route}</p>
+              <p><strong>${i18next.t('route_client.strategy')}:</strong> ${response.strategy}</p>
+            </div>
+          `;
+          
+          document.getElementById('route-client-result').innerHTML = html;
+        } else {
+          addLog(`${i18next.t('log.route_client_failed')}: ${response.error}`, 'error');
+          
+          document.getElementById('route-client-result').innerHTML = `
+            <div class="alert alert-danger">
+              ${response.error}
+            </div>
+          `;
+        }
+      } catch (error) {
+        addLog(`${i18next.t('log.route_client_error')}: ${error.message}`, 'error');
+        
+        document.getElementById('route-client-result').innerHTML = `
+          <div class="alert alert-danger">
+            ${error.message}
+          </div>
+        `;
+      }
+    });
+    
+    // 语言切换事件处理
+    document.querySelectorAll('.language-option').forEach(option => {
+      option.addEventListener('click', (e) => {
+        e.preventDefault();
+        const lang = option.getAttribute('data-lang');
+        changeLanguage(lang);
+        
+        // 更新激活状态
+        document.querySelectorAll('.language-option').forEach(opt => {
+          opt.classList.remove('active');
+        });
+        option.classList.add('active');
+      });
+    });
+    
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      // 初始化i18n
+      initI18n().then(() => {
+        // 初始化客户端
+        init();
+      });
+    });
+  </script>
+</body>
+</html> 
